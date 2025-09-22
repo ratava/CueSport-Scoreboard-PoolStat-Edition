@@ -68,19 +68,43 @@ for more information about Salotto please visit https://salotto.app
 				<span></span>
 				<div class="hover obs28" id="sendPInfo" onclick="postInfo()">Update Info</div>
 			</div>
-			<div class="section-header" id="poolStatLabel">PoolStat Match Details</div>
-			<div class="column">
-				<text id="compID">Competition ID:</text><input style="width: 45px;" type="text" id="compIDTxt" placeholder="" maxlength="5">
-				Match Reference Number:<input style="width: 45px;" type="text" id="matchIDTxt" placeholder="" maxlength="4">
+			<div class="section-header" id="poolStatLabel">PoolStat Match Details   
 			</div>
 			<div class="column">
-				<span></span>
-				<div class="hover obs28" id="getMatchInfo" onclick="getMatchInitialInfo()">Get Match Info</div>
+				<text id="compID">Competition ID:</text>
+				<div class="hover-container">
+				ⓘ
+				<span class="info-box">
+					<p>The Competition ID is located in Poolstat.net.au.
+					Go to your Competition page and the first number located in the <br>
+					address bar at the top of your browse is the Competition ID.</p>
+					<p>E.g. 
+					https://www.poolstat.net.au/club/stats/7011/65450/20252026-comp<br>
+					The competition ID is 7011
+					</p>
+				</span>
+				</div>		
+				<input style="width: 45px;" type="text" id="compIDTxt" placeholder="" maxlength="5">
+				<text id="matchID">Match Reference Number:</text>
+				<div class="hover-container">
+				ⓘ
+				<span class="info-box" style="width: 200px;">
+					<p>
+					The match Reference Number is located on your<br>
+					matches page in the first column.<br>
+					</p><p>
+					e.g. 42</p>
+					<p><text style="color: red">Note Match must be in the "Playing" State<br>
+					on the current day to retrieve match detals</text></p>
+				</span>
+				</div>										
+				<input style="width: 45px;" type="text" id="matchIDTxt" placeholder="" maxlength="4">
 			</div>
 			<div class="column">
 				<span></span>
 				<label id="matchLiveLabel" class="noShow">Match is now live. Score updated every 15sec</label>
-				<div class="hover obs28 noShow" id="stopPSTimerUpdate" onclick="stopPSDataTimer()">Stop Updating</div>
+				<div class="hover obs28 noShow" id="stopPSTimerUpdate" onclick="stopPSDataTimer()">Stop Updating</div>				
+				<div class="hover obs28" id="getMatchInfo" onclick="getMatchInitialInfo()">Get Match Info</div>
 			</div>
 
 			<div class="section-header" id="playerDetailLabel">Player/Team Details</div>
@@ -128,7 +152,7 @@ for more information about Salotto please visit https://salotto.app
 			</div>
 			<div class="column" id="colorSwap">
 				<div class="hover obs28" id="swapBtn" onclick="swapColors()">Swap Colors</div>
-				<span></span>
+				<div class="hover obs28" id="clearButton" onclick="clearGame()">Clear Game</div>
 				<div class="hover obs28" id="sendPNames" onclick="postNames()">Update Names</div>
 			</div>
 		</div>
@@ -168,6 +192,31 @@ for more information about Salotto please visit https://salotto.app
 					</label>
 				</div>
 			</div>
+
+			<div class="section-header" id="ballSetLabel">Ball Set Toggle</div>
+			<div class="column" id="BallSet">
+				<div>
+					<form id="ballSetSelectionForm" onchange="ballSetChange()">
+					<p>Player 1 Ball Color:
+						<input type="radio" id="p1colorRed" name="p1BallSetSelect" value="p1red/smalls">
+						<label for="p1colorRed">Red/Smalls</label>
+						<input type="radio" id="p1colorYellow" name="p1BallSetSelect" value="p1yellow/bigs">
+						<label for="p1colorYellow">Yellow/Bigs</label>
+						<input type="radio" id="p1colorOpen" name="p1BallSetSelect" value="p1Open" checked>
+						<label for="p1colorOpen">Open Table</label>						
+					<br>
+					<p>Player 2 Ball Color:
+						<input type="radio" id="p2colorRed" name="p2BallSetSelect" value="p2red/smalls">
+						<label for="p2colorRed">Red/Smalls</label>
+						<input type="radio" id="p2colorYellow" name="p2BallSetSelect" value="p2yellow/bigs">
+						<label for="p2colorYellow">Yellow/Bigs</label>
+						<input type="radio" id="p2colorOpen" name="p2BallSetSelect" value="p2Open" checked>
+						<label for="p2colorOpen">Open Table</label>
+					</p>
+					</form>					
+				</div>
+			</div>
+
 			<div class="section-header" id="ballTrackerLabel">Ball Tracker</div>
 			<div class="ballTracker" id="ballTrackerDiv">
 				<div id="worldBallTracker" class="noShow">
@@ -341,6 +390,7 @@ for more information about Salotto please visit https://salotto.app
 					<div><label for="useClockSetting" id="labelForUseClockSetting">Clock</label><input type="checkbox" class="smallSize" id="useClockSetting" onchange="clockSetting()"></div>
 					<div><label for="useToggleSetting" id="labelForUseToggleSetting">Player Toggle</label><input type="checkbox" class="smallSize" id="useToggleSetting" onchange="toggleSetting()"></div>
 					<div><label for="ballTrackerCheckbox" id="labelForBallTrackerCheckbox">Ball Tracker</label><input type="checkbox" class="smallSize" id="ballTrackerCheckbox" onchange="useBallTracker()"></div>
+					<div><label for="ballSetCheckbox" id="labelForBallSetCheckbox">Ball Set Toggle</label><input type="checkbox" class="smallSize" id="ballSetCheckbox" onchange="useBallSetToggle()"></div>
 					<div><label for="poolStatCheckbox" id="labelForPoolStatCheckbox">PoolStat</label><input type="checkbox" class="smallSize" id="poolStatCheckbox" onchange="poolStatSetting()"></div>
 					<div></div>
 				</div>

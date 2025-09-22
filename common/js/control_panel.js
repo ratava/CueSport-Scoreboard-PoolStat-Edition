@@ -1,7 +1,6 @@
 'use strict';
 let psDataTimerEnabled = false; //declare global var for PoolState Data Collection
-let psDataTimerId = ""; //declare global var for PoolState Data Collection
-
+let psDataTimerId = null; //declare global var for PoolState Data Collection
 // CueSport ScoreBoard is a modified version of G4ScoreBoard by Iain MacLeod. The purpose of this modification was to simplify and enhance the UI/UX for users.
 // I have removed the Salotto logo, as I myself have not asked for permission to use - but if you choose to use it, it can be uploaded as a custom logo.
 // This implementation now uses 5 custom logos, 2 associated with players, and 3 for a slideshow functionality.
@@ -147,6 +146,50 @@ function ballType(value) {
 	}
 
 	resetBallTracker();
+}
+
+function ballSetChange() {
+    const getSelectedP1Set = () => {
+        const selectedRadio = document.querySelector('input[name="p1BallSetSelect"]:checked');
+        if (selectedRadio) {
+            return selectedRadio.value;
+        }
+        return null; // Or handle the case where no radio button is selected
+    };
+    const getSelectedP2Set = () => {
+        const selectedRadio = document.querySelector('input[name="p2BallSetSelect"]:checked');
+        if (selectedRadio) {
+            return selectedRadio.value;
+        }
+        return null; // Or handle the case where no radio button is selected
+    };
+
+	var p1Selected = getSelectedP1Set()
+	var p2Selected = getSelectedP2Set()
+	console.log(`Player 1 Ball Set Selected ${p1Selected}`)
+	console.log(`Player 2 Ball Set Selected ${p2Selected}`)
+
+	if (p1Selected === "p1red/smalls") {
+		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p2yellow/bigs"]');
+		myRadioButton.checked = true;
+	} else if (p1Selected === "yellow/bigs") {
+		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p2red/smalls"]');
+		myRadioButton.checked = true;
+	} else { //open table
+		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p2Open"]');
+		myRadioButton.checked = true;
+	}
+	if (p2Selected === "p1red/smalls") {
+		var myRadioButton = document.querySelector('input[name="p1BallSetSelect"][value="p1yellow/bigs"]');
+		myRadioButton.checked = true;
+	} else if (p2Selected === "yellow/bigs") {
+		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p1red/smalls"]');
+		myRadioButton.checked = true;
+	} else { //open table
+		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p1Open"]');
+		myRadioButton.checked = true;
+	}
+
 }
 
 function useBallTracker(){
@@ -505,7 +548,7 @@ function poolStatSetting() {
 	console.log(`Use PoolStat ${isChecked}`);
     setStorageItem("usePoolStat", storageValue);
 
-	var state = document.getElementById("teamInfo").style.display
+	//var state = document.getElementById("teamInfo").style.display
 
 	if (isChecked) {
 		/* Set the Player Names to blank and hide the html elements*/
@@ -519,6 +562,21 @@ function poolStatSetting() {
 
 	pushScores();
     updateTabVisibility();
+}
+
+function useBallSetToggle() {
+   	var useBallSet = document.getElementById("ballSetCheckbox");
+    var isChecked = useBallSet.checked;
+    var storageValue = isChecked ? "yes" : "no";
+    
+	console.log(`Use Ball Set Toggle ${isChecked}`);
+    setStorageItem("useBallSet", storageValue);
+	if (isChecked) {
+		document.getElementById("ballSet").style.display = 'none';
+	} else {
+		document.getElementById("ballSet").style.display = 'flex';
+	}
+
 }
 
 
@@ -569,6 +627,22 @@ function clockDisplay(opt3) {
 		document.getElementById("shotClockShow").style.background = "none";
 		document.getElementById("shotClockShow").style.color = "lightgrey";
 	}
+}
+
+function clearGame() {
+	console.log('Clearing Match Data');
+	document.getElementById("raceInfoTxt").value = "";
+	document.getElementById("gameInfoTxt").value = "";
+	document.getElementById("p1Name").value = "";
+	document.getElementById("p2Name").value = "";
+	setStorageItem("p1NameCtrlPanel", "");
+	setStorageItem("p2NameCtrlPanel", "");	
+	setStorageItem("raceInfo", "");
+	setStorageItem("gameInfo", "");	
+	postNames();
+	pushScores();
+	postInfo();	
+
 }
 
 function postNames() {
@@ -641,7 +715,8 @@ function getMatchInitialInfo() {
 			if (json.as1!= null) {document.getElementById("p2Score").value = json.as1;}
 			if (json.ev1.length > 1) {document.getElementById("gameInfoTxt").value = json.ev1;}
 			if (json.mf1.length > 1) {document.getElementById("raceInfoTxt").value = json.mf1;}
-
+			setStorageItem("raceInfo", document.getElementById("raceInfoTxt").value);
+			setStorageItem("gameInfo", document.getElementById("gameInfoTxt").value);
 			postNames();
 			pushScores();
 			postInfo();
