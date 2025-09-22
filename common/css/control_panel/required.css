@@ -136,6 +136,7 @@ input[type="number"]::-webkit-outer-spin-button {
 	opacity: 0.2;
 }
 
+
 #p1colorDiv, #p2colorDiv, #p1Name, #p2Name {
 	cursor: pointer;
 	width:150px;
@@ -149,12 +150,16 @@ input[type="number"]::-webkit-outer-spin-button {
 	padding: 0px;
 }
 
-#shotClock30, #shotClock60, #stopClockDiv, #sendPNames, #sendPInfo, #getMatchInfo, #resetScores, #sendPScores, #swapBtn, #shotClockShow, #logoSsImg1, #logoSsImg2, #logoSsImg3, #logoSsImg4, #logoSsImg5{
+#shotClock30, #shotClock60, #stopClockDiv, #sendPNames, #sendPInfo, #getMatchInfo, #stopPSTimerUpdate, #resetScores, #sendPScores, #swapBtn, #shotClockShow, #logoSsImg1, #logoSsImg2, #logoSsImg3, #logoSsImg4, #logoSsImg5{
 	cursor: pointer;
 	width: 100px;
 	font-size: 10pt;
 	padding: 0px 0px 0px 0px;
 	border:2px solid black;
+}
+
+#matchLiveLabel {
+	color: green;
 }
 
 #raceInfoTxt, #gameInfoTxt{

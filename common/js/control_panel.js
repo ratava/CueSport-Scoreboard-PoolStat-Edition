@@ -1,4 +1,7 @@
 'use strict';
+let psDataTimerEnabled = false; //declare global var for PoolState Data Collection
+let psDataTimerId = ""; //declare global var for PoolState Data Collection
+
 // CueSport ScoreBoard is a modified version of G4ScoreBoard by Iain MacLeod. The purpose of this modification was to simplify and enhance the UI/UX for users.
 // I have removed the Salotto logo, as I myself have not asked for permission to use - but if you choose to use it, it can be uploaded as a custom logo.
 // This implementation now uses 5 custom logos, 2 associated with players, and 3 for a slideshow functionality.
@@ -612,10 +615,10 @@ function saveMatchInfo() {
 	getMatchInfo()
 }
 
-function getMatchInfo() {
+function getMatchInitialInfo() {
 //retrive the match data from poolstat and update if it valid
 
-	fetch("https://www.poolstat.net.au/livestream/testscore", {
+	fetch("https://www.poolstat.net.au/livestream/testscore2", {
 	method: "POST",
 	body: new URLSearchParams({
 		'type': 'elim',
@@ -629,14 +632,63 @@ function getMatchInfo() {
 	.then((response) => response.json())
 	.then((json) => {
 		if (Object.keys(json).length == 14) {
+			//match must be live so start the data collection timer
+			startPSDataTimer();
+
 			if (json.hp1.length > 1) {document.getElementById("p1Name").value = json.hp1;}
 			if (json.ap1.length > 1) {document.getElementById("p2Name").value = json.ap1;}
 			if (json.hs1!= null) {document.getElementById("p1Score").value = json.hs1;}
 			if (json.as1!= null) {document.getElementById("p2Score").value = json.as1;}
 			if (json.ev1.length > 1) {document.getElementById("gameInfoTxt").value = json.ev1;}
+			if (json.mf1.length > 1) {document.getElementById("raceInfoTxt").value = json.mf1;}
+
 			postNames();
 			pushScores();
 			postInfo();
+		}
+	})
+}
+
+function startPSDataTimer() {
+	console.log('Starting Data Collection Timer')
+	psDataTimerEnabled = true;
+	document.getElementById("matchLiveLabel").classList.remove("noShow");
+	document.getElementById("stopPSTimerUpdate").classList.remove("noShow");
+	psDataTimerId = setInterval(getMatchInfo, 5000);
+}
+
+function stopPSDataTimer() {
+	console.log('Stopping Data Collection Timer')
+	psDataTimerEnabled = false;
+	document.getElementById("matchLiveLabel").classList.add("noShow");
+	document.getElementById("stopPSTimerUpdate").classList.add("noShow");
+	clearInterval(psDataTimerId);
+}
+
+function getMatchInfo() {
+//retrive the match data from poolstat and update if it valid
+
+	fetch("https://www.poolstat.net.au/livestream/testscore2", {
+	method: "POST",
+	body: new URLSearchParams({
+		'type': 'elim',
+		'compid1': compIDTxt.value,
+		'matchid1': matchIDTxt.value
+		}),
+	headers: {
+		"Content-Type": "application/x-www-form-urlencoded"
+	}
+	})
+	.then((response) => response.json())
+	.then((json) => {
+		if (Object.keys(json).length == 14) {
+			console.log('Collecting PoolStat Match Scores')
+			if (json.hs1!= null) {document.getElementById("p1Score").value = json.hs1;}
+			if (json.as1!= null) {document.getElementById("p2Score").value = json.as1;}
+			pushScores();
+		} else {
+			//match must be finished so stop the data collection timer
+			stopPSDataTimer();
 		}
 	})
 }

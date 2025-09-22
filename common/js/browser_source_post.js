@@ -104,7 +104,7 @@ const handlers = {
             console.log(typeof getStorageItem("raceInfo"));
             console.log("a " + getStorageItem("raceInfo"));
             if (!Number.isNaN(raceTxt)) { //It is a number only value
-                document.getElementById("raceInfo").innerHTML = "Race to " + getStorageItem("raceInfo");
+                document.getElementById("raceInfo").innerHTML = "" + getStorageItem("raceInfo");
             } else { // It has Alphanumeric Charachers
                 document.getElementById("raceInfo").innerHTML = getStorageItem("raceInfo");
             }
@@ -572,7 +572,7 @@ if (getStorageItem("raceInfo") != "" && getStorageItem("raceInfo") != null && bo
     var racenNum = parseInt(getStorageItem("raceInfo"));
     console.log(typeof racenNum);
     if (typeof racenNum === "number") { //It is a number only value
-        document.getElementById("raceInfo").innerHTML = "Race to " + getStorageItem("raceInfo");
+        document.getElementById("raceInfo").innerHTML = "" + getStorageItem("raceInfo");
     } else { // It has Alphanumeric Charachers
         document.getElementById("raceInfo").innerHTML = getStorageItem("raceInfo");
     }

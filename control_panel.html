@@ -75,8 +75,14 @@ for more information about Salotto please visit https://salotto.app
 			</div>
 			<div class="column">
 				<span></span>
-				<div class="hover obs28" id="getMatchInfo" onclick="getMatchInfo()">Get Match Info</div>
+				<div class="hover obs28" id="getMatchInfo" onclick="getMatchInitialInfo()">Get Match Info</div>
 			</div>
+			<div class="column">
+				<span></span>
+				<label id="matchLiveLabel" class="noShow">Match is now live. Score updated every 15sec</label>
+				<div class="hover obs28 noShow" id="stopPSTimerUpdate" onclick="stopPSDataTimer()">Stop Updating</div>
+			</div>
+
 			<div class="section-header" id="playerDetailLabel">Player/Team Details</div>
 			<div class="column" id="teamInfo" >
 				<label id="p1NameLabel" for="p1Name">Player/Team 1 Name:</label><input type="text" id="p1Name" placeholder="Player 1" maxlength="20">
