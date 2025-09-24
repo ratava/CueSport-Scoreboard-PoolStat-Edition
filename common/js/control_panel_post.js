@@ -73,6 +73,15 @@ var pColormsg;
 // onload stuff
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function genPsRigId() {
+    return 'xxxx-xxxx-xxxx'
+    .replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0, 
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 window.onload = function() {
 	// Set local storage values if not previously configured
 	if (getStorageItem("usePlayer1") === null) {
@@ -197,6 +206,16 @@ window.onload = function() {
 		setStorageItem("usePoolStat", "yes");
 		console.log ('PoolStat initalised')
 	}
+
+	if (getStorageItem("PoolStatRigID") === null) {
+		const psRigId = genPsRigId();
+		setStorageItem("PoolStatRigID", psRigId);
+		console.log ('PoolStat Rig ID: ' + psRigId)
+		document.getElementById("psRigId").textContent = psRigId;
+	} else {
+		console.log('PS Rig ID: ' + getStorageItem("PoolStatRigID"));
+		document.getElementById("psRigIdTxt").textContent = getStorageItem("PoolStatRigID");
+	}	
 	
 	// Call the visibility functions based on the checkbox states
     setPlayerVisibility(1);

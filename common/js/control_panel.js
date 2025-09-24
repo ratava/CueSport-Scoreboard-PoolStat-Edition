@@ -54,7 +54,63 @@ function updateTabVisibility() {
 // Call updateTabVisibility on page load to set initial tab visibility
 document.addEventListener("DOMContentLoaded", function() {
 	updateTabVisibility();
+	//check if we are using PoolStat Live Stream and connect if setup.
+	if (getStorageItem("usePoolStat") === "yes") {
+		if (getStorageItem("PoolStatRigID") != null) {
+			connectPSLiveStream();
+		}
+	}
 });
+
+function connectPSLiveStream() {
+	const psRidID = getStorageItem("PoolStatRigID");
+	const clientId = psRidID;
+    const host = 'wss://btim.brellahost.com.au:9001/'
+    const options = {
+      keepalive: 60,
+      clientId: clientId,
+      protocolId: 'MQTT',
+      protocolVersion: 5,
+      clean: true,
+      reconnectPeriod: 1000,
+      connectTimeout: 30 * 1000,
+      will: {
+        topic: 'WillMsg',
+        payload: 'Connection Closed abnormally..!',
+        qos: 0,
+        retain: false
+      },
+    }
+    console.log('Connecting to PoolStat Live Stream server')
+	psLiveStatus.textContent = 'Connecting to PoolStat Live Stream server';
+
+    const client = mqtt.connect(host, options)
+  
+    client.on('connect', function () {
+    	console.log('Connected to PoolStat Live Stream');
+	  	psLiveStatus.textContent = 'Connected to PoolStat Live Stream. Awaiting Match';
+
+		console.log('Subscribing & Sending Status');
+    	client.subscribe('livestream/matches');
+    	client.publish('livestream/status','Rig ' + psRidID + ' Online');
+    })
+
+    client.on('error', (err) => {
+      console.log('Connection error: ', err);
+      client.end();
+    })
+
+    client.on('message', function (topic, message) {
+      if (JSON.parse(message.toString())) {
+		saveMatchInfo(JSON.parse(message.toString()));
+      }
+    })
+
+    client.on('reconnect', () => {
+      console.log('Reconnecting to PoolStat Live Stream');
+	  psLiveStatus.textContent = 'Reconnecting to PoolStat Live Stream';
+    })
+}
 
 function openTab(evt, tabName) {
     var i, tabcontent, tablinks;
@@ -675,98 +731,21 @@ function postInfo() {
 	setStorageItem("gameInfo", gameInfoTxt.value);
 }
 
-function saveMatchInfo() {
-	if (compIDTxt.value == " ") {
-		compIDTxt.value = null;
-	}
-	if (matchIDTxt.value == " ") {
-		matchIDTxt.value = null;
-	}
-	setStorageItem("compID", compIDTxt.value);
-	setStorageItem("matchID", matchIDTxt.value);
-	console.log(`PoolStat Competition ID: ${compIDTxt.value}`)
-	console.log(`PoolStat Match ID: ${matchIDTxt.value}`)
-	getMatchInfo()
+function saveMatchInfo(updateJSON) {
+	if (Object.keys(updateJSON).length == 11) {
+		console.log('Update Received');
+		if (updateJSON["mf"].length > 1) {document.getElementById("raceInfoTxt").value = updateJSON["mf"];}
+		if (updateJSON["ev"].length > 1) {document.getElementById("gameInfoTxt").value = updateJSON["ev"];}
+		postInfo();
+		if (updateJSON["hp"].length > 1) {document.getElementById("p1Name").value = updateJSON["hp"];}
+		if (updateJSON["ap"].length > 1) {document.getElementById("p2Name").value = updateJSON["ap"];}
+		postNames();
+		if (updateJSON["hs"] != null) {document.getElementById("p1Score").value = updateJSON["hs"];}
+ 		if (updateJSON["as"] != null) {document.getElementById("p2Score").value = updateJSON["as"];}	
+		pushScores();	
+	}	
 }
 
-function getMatchInitialInfo() {
-//retrive the match data from poolstat and update if it valid
-
-	fetch("https://www.poolstat.net.au/livestream/testscore2", {
-	method: "POST",
-	body: new URLSearchParams({
-		'type': 'elim',
-		'compid1': compIDTxt.value,
-		'matchid1': matchIDTxt.value
-		}),
-	headers: {
-		"Content-Type": "application/x-www-form-urlencoded"
-	}
-	})
-	.then((response) => response.json())
-	.then((json) => {
-		if (Object.keys(json).length == 14) {
-			//match must be live so start the data collection timer
-			startPSDataTimer();
-
-			if (json.hp1.length > 1) {document.getElementById("p1Name").value = json.hp1;}
-			if (json.ap1.length > 1) {document.getElementById("p2Name").value = json.ap1;}
-			if (json.hs1!= null) {document.getElementById("p1Score").value = json.hs1;}
-			if (json.as1!= null) {document.getElementById("p2Score").value = json.as1;}
-			if (json.ev1.length > 1) {document.getElementById("gameInfoTxt").value = json.ev1;}
-			if (json.mf1.length > 1) {document.getElementById("raceInfoTxt").value = json.mf1;}
-			setStorageItem("raceInfo", document.getElementById("raceInfoTxt").value);
-			setStorageItem("gameInfo", document.getElementById("gameInfoTxt").value);
-			postNames();
-			pushScores();
-			postInfo();
-		}
-	})
-}
-
-function startPSDataTimer() {
-	console.log('Starting Data Collection Timer')
-	psDataTimerEnabled = true;
-	document.getElementById("matchLiveLabel").classList.remove("noShow");
-	document.getElementById("stopPSTimerUpdate").classList.remove("noShow");
-	psDataTimerId = setInterval(getMatchInfo, 5000);
-}
-
-function stopPSDataTimer() {
-	console.log('Stopping Data Collection Timer')
-	psDataTimerEnabled = false;
-	document.getElementById("matchLiveLabel").classList.add("noShow");
-	document.getElementById("stopPSTimerUpdate").classList.add("noShow");
-	clearInterval(psDataTimerId);
-}
-
-function getMatchInfo() {
-//retrive the match data from poolstat and update if it valid
-
-	fetch("https://www.poolstat.net.au/livestream/testscore2", {
-	method: "POST",
-	body: new URLSearchParams({
-		'type': 'elim',
-		'compid1': compIDTxt.value,
-		'matchid1': matchIDTxt.value
-		}),
-	headers: {
-		"Content-Type": "application/x-www-form-urlencoded"
-	}
-	})
-	.then((response) => response.json())
-	.then((json) => {
-		if (Object.keys(json).length == 14) {
-			console.log('Collecting PoolStat Match Scores')
-			if (json.hs1!= null) {document.getElementById("p1Score").value = json.hs1;}
-			if (json.as1!= null) {document.getElementById("p2Score").value = json.as1;}
-			pushScores();
-		} else {
-			//match must be finished so stop the data collection timer
-			stopPSDataTimer();
-		}
-	})
-}
 
 function pushScores() {
 	// Send current scores

@@ -31,6 +31,12 @@ for more information about Salotto please visit https://salotto.app
 	<script src="./common/js/jquery.js"></script>
 	<script src="./common/js/control_panel.js"></script>
 	<script src="hotkeys.js"></script>
+	<script src="./common/js/mqtt.min.js"></script>
+	<script>
+	// An mqtt variable will be initialized globally
+	console.log(mqtt)
+	</script>
+
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 </head>
 
@@ -71,6 +77,19 @@ for more information about Salotto please visit https://salotto.app
 			<div class="section-header" id="poolStatLabel">PoolStat Match Details   
 			</div>
 			<div class="column">
+				<text id="poolStatRigIdlabel">PoolStat Unique Rig ID: </text>
+				<text id="psRigIdTxt"></text>		
+				<div class="hover-container">
+				ⓘ
+				<span class="info-box">
+					<p>This ID will need to be Applied to your table configuration in Poolstat live.
+						Not having a matching ID will stop live updates wortking on this Rig.
+					</p>
+				</span>
+				</div>					
+				<div class="hover obs28" id="regenPSRigID" onclick="regenPSRigId()">Regenerate</div>			
+			</div>
+			<!-- <div class="column">
 				<text id="compID">Competition ID:</text>
 				<div class="hover-container">
 				ⓘ
@@ -99,12 +118,14 @@ for more information about Salotto please visit https://salotto.app
 				</span>
 				</div>										
 				<input style="width: 45px;" type="text" id="matchIDTxt" placeholder="" maxlength="4">
-			</div>
+			</div> -->
 			<div class="column">
 				<span></span>
-				<label id="matchLiveLabel" class="noShow">Match is now live. Score updated every 15sec</label>
+				<text id="psLiveStatusTxt">PoolStat LiveStream Status: </text>
+				<text id="psLiveStatus"></text>		
+				<!-- <label id="matchLiveLabel" class="noShow">Match is now live. Score updated every 15sec</label>
 				<div class="hover obs28 noShow" id="stopPSTimerUpdate" onclick="stopPSDataTimer()">Stop Updating</div>				
-				<div class="hover obs28" id="getMatchInfo" onclick="getMatchInitialInfo()">Get Match Info</div>
+				<div class="hover obs28" id="getMatchInfo" onclick="getMatchInitialInfo()">Get Match Info</div> -->
 			</div>
 
 			<div class="section-header" id="playerDetailLabel">Player/Team Details</div>
