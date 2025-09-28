@@ -1,6 +1,4 @@
 'use strict';
-let psDataTimerEnabled = false; //declare global var for PoolState Data Collection
-let psDataTimerId = null; //declare global var for PoolState Data Collection
 // CueSport ScoreBoard is a modified version of G4ScoreBoard by Iain MacLeod. The purpose of this modification was to simplify and enhance the UI/UX for users.
 // I have removed the Salotto logo, as I myself have not asked for permission to use - but if you choose to use it, it can be uploaded as a custom logo.
 // This implementation now uses 5 custom logos, 2 associated with players, and 3 for a slideshow functionality.
@@ -58,17 +56,56 @@ document.addEventListener("DOMContentLoaded", function() {
 	if (getStorageItem("usePoolStat") === "yes") {
 		if (getStorageItem("PoolStatRigID") != null) {
 			connectPSLiveStream();
+			connectWebSocket();
 		}
 	}
 });
 
+function connectWebSocket() {
+	const obsWS = new OBSWebSocket();
+
+	// Connection details
+	const obsAddress = 'localhost:4455'; // Default OBS WebSocket address
+	const obsPassword = ''; // Set this in OBS WebSocket settings
+
+	obsWS.connect({ address: obsAddress, password: obsPassword })
+		.then(() => {
+			console.log('Connected to OBS WebSocket');
+			// Example: Get the current scene
+			return obsWS.call('GetCurrentProgramScene');
+		})
+		.then(data => {
+			console.log('Current Scene:', data.currentProgramSceneName);
+			// Example: Switch to a different scene
+			// return obs.call('SetCurrentProgramScene', { sceneName: 'My Other Scene' });
+		})
+		.catch(err => {
+			console.error('Error connecting or interacting with OBS:', err);
+		});
+
+	// Event listeners (optional, but useful for real-time updates)
+	obsWS.on('ConnectionClosed', () => {
+		console.log('Disconnected from OBS WebSocket');
+	});
+
+	obsWS.on('error', err => {
+		console.error('OBS WebSocket error:', err);
+	});
+
+	// Example of listening for a specific event (e.g., scene changes)
+	obsWS.on('CurrentProgramSceneChanged', data => {
+		console.log('Scene changed to:', data.sceneName);
+	});
+}
+
+
 function connectPSLiveStream() {
-	const psRidID = getStorageItem("PoolStatRigID");
-	const clientId = psRidID;
+	const psRigId = getStorageItem("PoolStatRigID");
+	console.log(psRigId);
     const host = 'wss://btim.brellahost.com.au:9001/'
     const options = {
       keepalive: 60,
-      clientId: clientId,
+      clientId: psRigId,
       protocolId: 'MQTT',
       protocolVersion: 5,
       clean: true,
@@ -92,7 +129,7 @@ function connectPSLiveStream() {
 
 		console.log('Subscribing & Sending Status');
     	client.subscribe('livestream/matches');
-    	client.publish('livestream/status','Rig ' + psRidID + ' Online');
+    	client.publish('livestream/status','Rig ' + psRigId + ' Online');
     })
 
     client.on('error', (err) => {
@@ -102,7 +139,14 @@ function connectPSLiveStream() {
 
     client.on('message', function (topic, message) {
       if (JSON.parse(message.toString())) {
-		saveMatchInfo(JSON.parse(message.toString()));
+		var messageJSON = JSON.parse(message.toString());
+		//check if the message for this Rig
+		if (messageJSON['rigId'] === psRigId) {
+			saveMatchInfo(JSON.parse(message.toString()));
+		} else {
+			//it is not ours so check if it matches our CompetitionID and if it does process it for 
+			//Ticker display
+		}
       }
     })
 
@@ -732,8 +776,14 @@ function postInfo() {
 }
 
 function saveMatchInfo(updateJSON) {
-	if (Object.keys(updateJSON).length == 11) {
+	if (Object.keys(updateJSON).length == 14) {
 		console.log('Update Received');
+		if (updateJSON["compId"].length > 1) {setStorageItem("compId", updateJSON["compId"]);}
+		if (updateJSON["matchId"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
+		if (updateJSON["table"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
+		if (updateJSON["obsProfileName"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
+		if (updateJSON["matchId"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
+
 		if (updateJSON["mf"].length > 1) {document.getElementById("raceInfoTxt").value = updateJSON["mf"];}
 		if (updateJSON["ev"].length > 1) {document.getElementById("gameInfoTxt").value = updateJSON["ev"];}
 		postInfo();
