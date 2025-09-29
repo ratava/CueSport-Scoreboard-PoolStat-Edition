@@ -359,18 +359,24 @@ const handlers = {
     },
 
     displayBallTracker(data) {
-        const ballTracker = document.getElementById("ballTracker");
-        if (!ballTracker) {
+        const ballTrackerWorld = document.getElementById("ballTrackerWorld");
+        if (!ballTrackerWorld) {
+            console.warn('Ball tracker element not found in DOM');
+            return;
+        }
+        const ballTrackerInternational = document.getElementById("ballTrackerInternational");
+        if (!ballTrackerInternational) {
             console.warn('Ball tracker element not found in DOM');
             return;
         }
         
-        if (data.displayBallTracker === true) {
-            ballTracker.classList.remove("noShow");
-            console.log('Show ball tracker');
-        } else if (data.displayBallTracker === false) {
-            ballTracker.classList.add("noShow");
-            console.log('Hide ball tracker');
+        console.log(data);
+        if (data.displayBallTracker === "World") {
+            ballTrackerWorld.classList.remove("noShow");
+            console.log('Show ball tracker World');
+        } else if (data.displayBallTracker === "International") {
+            ballTrackerInternational.classList.remove("noShow");
+            console.log('Show ball tracker Internatoinal');
         }
     },
 
@@ -619,18 +625,32 @@ if (getStorageItem('p2colorSet') != "") {
 }
 
 if (getStorageItem("enableBallTracker") === "false" || getStorageItem("enableBallTracker") === null){
-	document.getElementById("ballTracker").classList.add("noShow");
+    if (getStorageItem("ballType") === "World"){
+        document.getElementById("ballTrackerWorld").classList.add("noShow");
+    } else {
+        document.getElementById("ballTrackerInternational").classList.add("noShow");
+    }
 	console.log(`Ball tracker disabled on overlay`);
 } else {
-	document.getElementById("ballTracker").classList.remove("noShow");
+    if (getStorageItem("ballType") === "World"){
+        document.getElementById("ballTrackerWorld").classList.remove("noShow");
+    } else {
+        document.getElementById("ballTrackerInternational").classList.remove("noShow");
+    }
 	console.log(`Ball tracker enabled on overlay`);
 }
 
 // On browser_source.html load, check stored direction and apply it
 const initializeBallTracker = () => {
     const direction = getStorageItem("ballTrackerDirection") || "vertical";
-    const ballTracker = document.getElementById("ballTracker");
-    
+    const ballType = getStorageItem("ballType");
+    var ballTracker = null;
+    if (ballType === "World"){
+        ballTracker = document.getElementById("ballTrackerWorld");
+    } else {
+        ballTracker = document.getElementById("ballTrackerInternational");
+    }    
+
     if (ballTracker) {
         ballTracker.style.display = "flex";
         ballTracker.style.flexDirection = direction === "vertical" ? "column" : "row";

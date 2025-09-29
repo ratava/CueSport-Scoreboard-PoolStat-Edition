@@ -352,24 +352,28 @@ function useBallTracker(){
 		if (getStorageItem("ballType") === "World"){
 			document.getElementById("worldBallTracker").classList.remove("noShow");
 		} else {
-			document.getElementById("internationBallTracker").classList.remove("noShow");
+			document.getElementById("internationalBallTracker").classList.remove("noShow");
 		}		
 	} else {
 		document.getElementById("ballTrackerDirectionDiv").classList.add("noShow");
 		document.getElementById("ballTrackerDirection").classList.add("noShow");
 		document.getElementById("ballTrackerLabel").classList.add("noShow");
 		document.getElementById("ballTrackerDiv").classList.add("noShow");
-		document.getElementById("ballTracker").classList.add("noShow");
 		if (getStorageItem("ballType") === "World"){
 			document.getElementById("worldBallTracker").classList.add("noShow");
 		} else {
-			document.getElementById("internationBallTracker").classList.add("noShow");
+			document.getElementById("internationalBallTracker").classList.add("noShow");
 		}		
 	}
 	if (bothPlayersEnabled){
-		bc.postMessage({ displayBallTracker: document.getElementById("ballTrackerCheckbox").checked});
+		if (getStorageItem("ballType") === "World"){
+			bc.postMessage({ displayBallTracker: "World" });
+		} else {
+			bc.postMessage({ displayBallTracker: "International" });
+		}				
+		
 	}
-	console.log(`Both players are not enabled so we are not enabling the ball tracker`)
+	//console.log(`Both players are not enabled so we are not enabling the ball tracker`)
 }
 
 function toggleBallTrackerDirection() {
@@ -647,7 +651,8 @@ function playerSetting(player) {
         document.getElementById("ballTrackerDirection").classList.add("noShow");
         document.getElementById("ballTrackerLabel").classList.add("noShow");
         document.getElementById("ballTrackerDiv").classList.add("noShow");
-        document.getElementById("ballTracker").classList.add("noShow");
+		document.getElementById("internationalBallTracker").classList.add("noShow");
+		document.getElementById("worldBallTracker").classList.add("noShow");
 
         // Send messages to hide these features
         bc.postMessage({ clockDisplay: 'noClock' });

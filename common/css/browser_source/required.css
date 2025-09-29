@@ -100,7 +100,7 @@ html, body {
 }
 
 
-#ballTracker {
+#ballTrackerWorld, #ballTrackerInternational {
     position: fixed;
     padding: 4px;
     top: 15%;
