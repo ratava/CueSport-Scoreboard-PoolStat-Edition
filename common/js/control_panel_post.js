@@ -115,6 +115,36 @@ window.onload = function() {
 		poolStatSetting();
 	}
 
+	if (getStorageItem("usePoolStatOutputFile")==="yes" || getStorageItem("usePoolStatOutputFile") === null) {
+		document.getElementById("poolStatConfigOutputFileCheckbox").checked = true;
+		setStorageItem("usePoolStatOutputFile", "yes");
+		poolStatSetting();
+	} else {
+		document.getElementById("poolStatConfigOutputFileCheckbox").checked = false;
+		setStorageItem("usePoolStatOutputFile", "no");
+		poolStatSetting();
+	}
+	
+	if (getStorageItem("usePoolStatTicker")==="yes" || getStorageItem("usePoolStatTicker") === null) {
+		document.getElementById("poolStatConfigTickerCheckbox").checked = true;
+		setStorageItem("usePoolStatTicker", "yes");
+		poolStatSetting();
+	} else {
+		document.getElementById("poolStatConfigTickerCheckbox").checked = false;
+		setStorageItem("usePoolStatTicker", "no");
+		poolStatSetting();
+	}
+	
+	if (getStorageItem("usePoolStatBreakingPlayer")==="yes" || getStorageItem("usePoolStatBreakingPlayer") === null) {
+		document.getElementById("poolStatConfigBreakingPlayerCheckbox").checked = true;
+		setStorageItem("usePoolStatBreakingPlayer", "yes");
+		poolStatSetting();
+	} else {
+		document.getElementById("poolStatConfigBreakingPlayerCheckbox").checked = false;
+		setStorageItem("usePoolStatBreakingPlayer", "no");
+		poolStatSetting();
+	}
+
 	if (getStorageItem("usePlayer1") === "yes" && getStorageItem("usePlayer2") === "yes" && getStorageItem("usePlayerToggle") === "yes"){
 		console.log(`We should be showing active player identifier`);
 		const activePlayer = getStorageItem("activePlayer") === "2" ? "2" : "1";
@@ -205,6 +235,21 @@ window.onload = function() {
 	if (getStorageItem("usePoolStat") === null) {
 		setStorageItem("usePoolStat", "yes");
 		console.log ('PoolStat initalised')
+	}
+	
+	if (getStorageItem("usePoolStatOutputFile") === null) {
+		setStorageItem("usePoolStatOutputFile", "no");
+		console.log ('PoolStat Output File initalised')
+	}
+
+	if (getStorageItem("usePoolStatTicker") === null) {
+		setStorageItem("usePoolStatTicker", "no");
+		console.log ('PoolStat Ticker initalised')
+	}
+
+	if (getStorageItem("usePoolStatBreakingPlayer") === null) {
+		setStorageItem("usePoolStatBreakingPlayer", "yes");
+		console.log ('PoolStat Breaking Player initalised')
 	}
 
 	if (getStorageItem("PoolStatRigID") === null) {

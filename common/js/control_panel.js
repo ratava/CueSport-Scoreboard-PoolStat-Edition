@@ -43,10 +43,12 @@ function updateTabVisibility() {
 
     // Get tab elements
     const scoringTab = document.getElementById("scoringTab");
+	const poolStatTab = document.getElementById("poolStatTab");
 
     // Show or hide the scoring tab
     scoringTab.style.display = bothPlayersEnabled ? "inline-block" : "none";
 	scoringTab.style.display = poolStatEnabled ? "none" : "inline-block";
+	poolStatTab.style.display = poolStatEnabled ? "inline-block" : "none";
 }
 
 // Call updateTabVisibility on page load to set initial tab visibility
@@ -699,14 +701,37 @@ function poolStatSetting() {
 		/* Set the Player Names to blank and hide the html elements*/
 		document.getElementById("p1Name").value = " ";
 		document.getElementById("p2Name").value = " ";
-		//document.getElementById("teamInfo").style.display = 'none';
 		postNames();
-	} else {
-		//document.getElementById("teamInfo").style.display = 'flex';
-	}
-
+	} 
 	pushScores();
     updateTabVisibility();
+}
+
+function poolStatConfigOutputFile() {
+    var usePoolStatConfigOutputFile = document.getElementById("poolStatConfigOutputFileCheckbox");
+    var isChecked = usePoolStatConfigOutputFile.checked;
+    var storageValue = isChecked ? "yes" : "no";
+    
+	console.log(`Use PoolStat Output to File ${isChecked}`);
+    setStorageItem("usePoolStatOutputFile", storageValue);
+}
+
+function poolStatConfigTicker() {
+    var usePoolStatConfigTicker = document.getElementById("poolStatConfigTickerCheckbox");
+    var isChecked = usePoolStatConfigTicker.checked;
+    var storageValue = isChecked ? "yes" : "no";
+    
+	console.log(`Use PoolStat Ticker ${isChecked}`);
+    setStorageItem("usePoolStatTicker", storageValue);
+}
+
+function poolStatConfigBreakingPlayer() {
+    var usePoolStatConfigBreakingPlayer = document.getElementById("poolStatConfigBreakingPlayerCheckbox");
+    var isChecked = usePoolStatConfigBreakingPlayer.checked;
+    var storageValue = isChecked ? "yes" : "no";
+    
+	console.log(`Use PoolStat Breaking Player ${isChecked}`);
+    setStorageItem("usePoolStatBreakingPlayer", storageValue);
 }
 
 function useBallSetToggle() {
