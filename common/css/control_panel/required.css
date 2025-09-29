@@ -307,6 +307,15 @@ input {
 	height:fit-content;
 }
 
+.column-center {
+	display: flex;
+	justify-content:space-evenly;
+	padding: 10px 0 10px 0;
+	clear: both;
+	width: 650px;
+	height:fit-content;
+}
+
 .header {
 	display: flex;
 	justify-content:space-between;

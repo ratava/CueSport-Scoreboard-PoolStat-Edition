@@ -568,7 +568,7 @@ if (getStorageItem("gameType") === "game3"){
 document.getElementById("raceInfoTxt").value = getStorageItem("raceInfo");
 document.getElementById("gameInfoTxt").value = getStorageItem("gameInfo");
 document.getElementById("verNum").innerHTML = versionNum;
-document.getElementById("psVerNum").innerHTML = psVersionNum;
+// document.getElementById("psVerNum").innerHTML = psVersionNum;
 postNames(); postInfo(); startThemeCheck();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
