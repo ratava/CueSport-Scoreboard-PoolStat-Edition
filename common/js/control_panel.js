@@ -56,31 +56,41 @@ document.addEventListener("DOMContentLoaded", function() {
 	if (getStorageItem("usePoolStat") === "yes") {
 		if (getStorageItem("PoolStatRigID") != null) {
 			connectPSLiveStream();
-			connectWebSocket();
 		}
 	}
 });
 
-function connectWebSocket() {
+function setOBSStreamKey(newKey) {
 	const obsWS = new OBSWebSocket();
 
-	// Connection details
-	const obsAddress = 'localhost:4455'; // Default OBS WebSocket address
-	const obsPassword = ''; // Set this in OBS WebSocket settings
-
-	obsWS.connect({ address: obsAddress, password: obsPassword })
+	obsWS.connect()
 		.then(() => {
 			console.log('Connected to OBS WebSocket');
 			// Example: Get the current scene
-			return obsWS.call('GetCurrentProgramScene');
+			return obsWS.call('GetStreamServiceSettings');
 		})
 		.then(data => {
-			console.log('Current Scene:', data.currentProgramSceneName);
-			// Example: Switch to a different scene
-			// return obs.call('SetCurrentProgramScene', { sceneName: 'My Other Scene' });
+			console.log('Current Stream Service Settings:', data);
+			if (data.streamServiceType === 'rtmp_common') {
+				const newSettings = {
+					...data.streamServiceSettings, // Keep existing settings
+					key: newKey // Update the stream key
+				};
+				return obsWS.call('SetStreamServiceSettings', {
+					streamServiceType: 'rtmp_common',
+					streamServiceSettings: newSettings
+				});
+			} else {
+				console.log('Stream service is not RTMPStream, skipping stream key update.');
+				return Promise.resolve(); // Resolve to continue the chain
+			}
+		})
+		.then(() => {
+			console.log('Stream service settings updated (if applicable).');
+			obsWS.disconnect();
 		})
 		.catch(err => {
-			console.error('Error connecting or interacting with OBS:', err);
+			console.error('Error:', err);
 		});
 
 	// Event listeners (optional, but useful for real-time updates)
@@ -92,10 +102,45 @@ function connectWebSocket() {
 		console.error('OBS WebSocket error:', err);
 	});
 
-	// Example of listening for a specific event (e.g., scene changes)
-	obsWS.on('CurrentProgramSceneChanged', data => {
-		console.log('Scene changed to:', data.sceneName);
+	return obsWS;
+}
+
+function stopOBSStream() {
+	const obsWS = new OBSWebSocket();
+
+	obsWS.connect()
+		.then(() => {
+			console.log('Connected to OBS WebSocket');
+			// Example: Get the current scene
+			return obsWS.call('GetStreamStatus');
+		})
+		.then(data => {
+			console.log('Current Stream Status', data);
+			if (data.responseData.outputActive === true) {
+				return obsWS.call('StopStream');
+			} else {
+				console.log('Stream service is already running');
+				return Promise.resolve(); // Resolve to continue the chain
+			}
+		})
+		.then(() => {
+			console.log('Stream service Started');
+			obsWS.disconnect();
+		})
+		.catch(err => {
+			console.error('Error:', err);
+		});
+
+	// Event listeners (optional, but useful for real-time updates)
+	obsWS.on('ConnectionClosed', () => {
+		console.log('Disconnected from OBS WebSocket');
 	});
+
+	obsWS.on('error', err => {
+		console.error('OBS WebSocket error:', err);
+	});
+
+	return obsWS;
 }
 
 
