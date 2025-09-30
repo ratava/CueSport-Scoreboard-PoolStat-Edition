@@ -224,9 +224,8 @@ html, body {
     background: rgba(255,255,255,1);
     text-shadow: 1px 1px 2px black, 0 0 25px black, 0 0 5px black;
     -webkit-text-stroke: 1px black;
-    /* font-size: calc(var(--standard-font-size) * var(--ui-scaling)); */
+    font-size: calc(var(--standard-font-size) * var(--ui-scaling));
     /* font-size: calc(32px * var(--ui-scaling)); */
-    font-size: 32px;
     color: white;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.6);
     font-weight: bold;
@@ -240,13 +239,11 @@ html, body {
 
 #player1Name {
     background-image: linear-gradient(to left, white, steelblue);
-    min-height: 40px;
     padding: 5px 15px;
 }
 
 #player2Name {
     background-image: linear-gradient(to right, white, steelblue);
-    min-height: 40px;
     padding: 5px 15px;
 }
 
@@ -261,7 +258,6 @@ html, body {
     align-content: center;
     justify-content: center;
     display: inline-block;
-    height: 50px;
     background-color: rgba(128, 128, 128, 1);
 }
 
@@ -275,8 +271,6 @@ html, body {
     color: white;
     -webkit-text-stroke: 1px black;
     padding: 5px 10px;
-    min-width: 50px;
-    min-height: 50px;
     border: solid black;
     z-index: 2;
 }
@@ -284,14 +278,12 @@ html, body {
 #player1Score {
     border-width:2px 2px 2px 0; /* No left border */
     margin: 0 5px 0 0;
-    min-height: 50px;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.6);
 }
 
 #player2Score {
     border-width:2px 0 2px 2px; /* No right border */
     margin: 0 0 0 5px;
-    min-height: 50px;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.6);
 }
 
