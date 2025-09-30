@@ -49,23 +49,16 @@ for more information about Salotto please visit https://salotto.app
                     </span>
                 </a>
                 <div class="zoom-controls">
-                    <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">
-                        - ZOOM
-                    </button>
-                    <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">
-                        RESET
-                    </button>
-                    <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">
-                        + ZOOM
-                    </button>
+                    <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">- ZOOM</button>
+                    <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">RESET</button>
+                    <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">+ ZOOM</button>
                 </div>
-                <a
-                href="https://buymeacoffee.com/iainmacleod"
-                target="_blank"
-                rel="noopener noreferrer"
-                >
-                <span style="font-size: 10pt; color: red; top: 4px">Support</span>
+                <a href="https://buymeacoffee.com/iainmacleod" target="_blank" rel="noopener noreferrer">
+                    <span style="font-size: 10pt; color: red; top: 4px">Support Iain</span>
                 </a>
+                <a href="https://buymeacoffee.com/brentwesley" target="_blank" rel="noopener noreferrer">
+                    <span style="font-size: 10pt; color: red; top: 4px">Support Brent</span>
+                </a>                
             </div> <!-- Header-->
             <!-- Tab navigation inside the main division -->
             <div class="tab">
@@ -249,10 +242,10 @@ for more information about Salotto please visit https://salotto.app
                         </div>
                     </div>
                 <!-- Ball Set Toggle -->
-                <div class="section-header" id="ballSetLabel">Ball Set Toggle</div>
-                    <div class="column" id="BallSet">
+                <div class="section-header" id="ballSetLabel">Ball Color Toggle</div>
+                    <div class="column" id="ballSet">
                         <div>
-                            <form id="ballSetSelectionForm" onchange="ballSetChange()">
+                            <form id="ballSetSelectionForm" onclick="ballSetChange()">
                                 <p>Player 1 Ball Color:
                                     <input type="radio" id="p1colorRed" name="p1BallSetSelect" value="p1red/smalls" />
                                     <label for="p1colorRed">Red/Smalls</label>
@@ -260,14 +253,6 @@ for more information about Salotto please visit https://salotto.app
                                     <label for="p1colorYellow">Yellow/Bigs</label>
                                     <input type="radio" id="p1colorOpen" name="p1BallSetSelect" value="p1Open" checked/>
                                     <label for="p1colorOpen">Open Table</label>
-                                </p>
-                                <p>Player 2 Ball Color:
-                                    <input type="radio" id="p2colorRed" name="p2BallSetSelect" value="p2red/smalls"/>
-                                    <label for="p2colorRed">Red/Smalls</label>
-                                    <input type="radio" id="p2colorYellow" name="p2BallSetSelect" value="p2yellow/bigs"/>
-                                    <label for="p2colorYellow">Yellow/Bigs</label>
-                                    <input type="radio" id="p2colorOpen" name="p2BallSetSelect" value="p2Open" checked/>
-                                    <label for="p2colorOpen">Open Table</label>
                                 </p>
                             </form>
                        </div>
@@ -323,49 +308,49 @@ for more information about Salotto please visit https://salotto.app
                             </div>
                         </div>
                         <div id="internationalBallTracker" class="noShow">
-                            <div class="ball" id="ball 1" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 1" onclick="togglePot(this)">
                                 <img src="./common/images/red-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 2" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 2" onclick="togglePot(this)">
                                 <img src="./common/images/red-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 3" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 3" onclick="togglePot(this)">
                                 <img src="./common/images/red-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 4" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 4" onclick="togglePot(this)">
                                 <img src="./common/images/red-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 5" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 5" onclick="togglePot(this)">
                                 <img src="./common/images/red-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 6" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 6" onclick="togglePot(this)">
                                 <img src="./common/images/red-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 7" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 7" onclick="togglePot(this)">
                                 <img src="./common/images/red-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 8" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 8" onclick="togglePot(this)">
                                 <img src="./common/images/international-8-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 9" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 9" onclick="togglePot(this)">
                                 <img src="./common/images/yellow-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 10" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 10" onclick="togglePot(this)">
                                 <img src="./common/images/yellow-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 11" onclick="togglePot(this)">
+                            <div class="ball" id="i-all 11" onclick="togglePot(this)">
                                 <img src="./common/images/yellow-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 12" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 12" onclick="togglePot(this)">
                                 <img src="./common/images/yellow-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 13" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 13" onclick="togglePot(this)">
                                 <img src="./common/images/yellow-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 14" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 14" onclick="togglePot(this)">
                                 <img src="./common/images/yellow-international-small-ball.png" />
                             </div>
-                            <div class="ball" id="ball 15" onclick="togglePot(this)">
+                            <div class="ball" id="i-ball 15" onclick="togglePot(this)">
                                 <img src="./common/images/yellow-international-small-ball.png" />
                             </div>
                         </div>

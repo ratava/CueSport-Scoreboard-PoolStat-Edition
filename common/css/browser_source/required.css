@@ -253,6 +253,16 @@ html, body {
 .score-logo-container {
     position: relative;
     display: inline-block;
+
+}
+
+.score-ball-container {
+    position: relative;
+    align-content: center;
+    justify-content: center;
+    display: inline-block;
+    height: 50px;
+    background-color: rgba(128, 128, 128, 1);
 }
 
 /* Scores */

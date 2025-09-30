@@ -282,7 +282,11 @@ function gameType(value) {
 
 function ballType(value) {
 	setStorageItem("ballType", value);
-	bc.postMessage({ ballType: value });
+	if (document.getElementById("ballTrackerCheckbox").checked) {
+		bc.postMessage({ displayBallTracker: true, ballTrackerType: getStorageItem("ballType") });
+	}	else {
+		bc.postMessage({ displayBallTracker: false, ballTrackerType: getStorageItem("ballType") });
+	}
 	console.log(`Ball Type ${value}`)
 	if (getStorageItem("ballType") === "World"){
 		document.getElementById("worldBallTracker").classList.remove("noShow");
@@ -291,7 +295,6 @@ function ballType(value) {
 		document.getElementById("internationalBallTracker").classList.remove("noShow");
 		document.getElementById("worldBallTracker").classList.add("noShow");
 	}
-
 	resetBallTracker();
 }
 
@@ -303,40 +306,11 @@ function ballSetChange() {
         }
         return null; // Or handle the case where no radio button is selected
     };
-    const getSelectedP2Set = () => {
-        const selectedRadio = document.querySelector('input[name="p2BallSetSelect"]:checked');
-        if (selectedRadio) {
-            return selectedRadio.value;
-        }
-        return null; // Or handle the case where no radio button is selected
-    };
-
+	
 	var p1Selected = getSelectedP1Set()
-	var p2Selected = getSelectedP2Set()
+	bc.postMessage({ playerBallSet: p1Selected});
+
 	console.log(`Player 1 Ball Set Selected ${p1Selected}`)
-	console.log(`Player 2 Ball Set Selected ${p2Selected}`)
-
-	if (p1Selected === "p1red/smalls") {
-		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p2yellow/bigs"]');
-		myRadioButton.checked = true;
-	} else if (p1Selected === "yellow/bigs") {
-		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p2red/smalls"]');
-		myRadioButton.checked = true;
-	} else { //open table
-		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p2Open"]');
-		myRadioButton.checked = true;
-	}
-	if (p2Selected === "p1red/smalls") {
-		var myRadioButton = document.querySelector('input[name="p1BallSetSelect"][value="p1yellow/bigs"]');
-		myRadioButton.checked = true;
-	} else if (p2Selected === "yellow/bigs") {
-		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p1red/smalls"]');
-		myRadioButton.checked = true;
-	} else { //open table
-		var myRadioButton = document.querySelector('input[name="p2BallSetSelect"][value="p1Open"]');
-		myRadioButton.checked = true;
-	}
-
 }
 
 function useBallTracker(){
@@ -366,14 +340,12 @@ function useBallTracker(){
 		}		
 	}
 	if (bothPlayersEnabled){
-		if (getStorageItem("ballType") === "World"){
-			bc.postMessage({ displayBallTracker: "World" });
-		} else {
-			bc.postMessage({ displayBallTracker: "International" });
-		}				
-		
+		if (document.getElementById("ballTrackerCheckbox").checked) {
+			bc.postMessage({ displayBallTracker: true, ballTrackerType: getStorageItem("ballType") });
+		}	else {
+			bc.postMessage({ displayBallTracker: false, ballTrackerType: getStorageItem("ballType") });
+		}
 	}
-	//console.log(`Both players are not enabled so we are not enabling the ball tracker`)
 }
 
 function toggleBallTrackerDirection() {
@@ -747,9 +719,11 @@ function useBallSetToggle() {
 	console.log(`Use Ball Set Toggle ${isChecked}`);
     setStorageItem("useBallSet", storageValue);
 	if (isChecked) {
-		document.getElementById("ballSet").style.display = 'none';
-	} else {
 		document.getElementById("ballSet").style.display = 'flex';
+		document.getElementById("ballSetLabel").classList.remove("noShow");
+	} else {
+		document.getElementById("ballSet").style.display = 'none';
+		document.getElementById("ballSetLabel").classList.add("noShow");
 	}
 
 }
@@ -1329,8 +1303,14 @@ function resetScores() {
 		resetExt('p1', 'noflash');
 		resetExt('p2', 'noflash');
 		resetBallTracker();
+		resetBallSet();
 	} else { }
 }
+
+function resetBallSet() {
+	document.getElementById('p1colorOpen').checked = true;
+	bc.postMessage({ playerBallSet: 'p1Open' });
+}	
 
 function resetBallTracker() {
     // Retrieve the saved ball state from localStorage
