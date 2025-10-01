@@ -62,6 +62,53 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 });
 
+function poolstatUpdate(updateJSON) {
+	if (Object.keys(updateJSON).length == 18) {
+		console.log('Update Received');
+		if (updateJSON["compId"].length > 1) {setStorageItem("compId", updateJSON["compId"]);}
+		if (updateJSON["matchId"].length > 1) {setStorageItem("matchId", updateJSON["matchId"]);}
+		if (updateJSON["table"].length > 1) {setStorageItem("matchId", updateJSON["table"]);}
+		if (updateJSON["obsProfileName"].length > 1) {setStorageItem("obsProfileName", updateJSON["obsProfileName"]);}
+			
+		if (updateJSON["matchId"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
+		if (updateJSON["streamKey"].length > 1) {setStorageItem("streamKey", updateJSON["streamKey"]);}
+		if (updateJSON["streamStatus"] === true) {
+			setStorageItem("streamStatus", updateJSON["streamStatus"]);
+			changeOBSProfile(updateJSON["obsProfileName"]);
+			updateStreamStatus();
+		} else {
+			setStorageItem("streamStatus", updateJSON["streamStatus"]);
+			updateStreamStatus();
+		}
+		if (updateJSON["breakingPlayer"] != null) {setStorageItem("breakingPlayer", updateJSON["breakingPlayer"]);}
+		if (updateJSON["homePlayerLogo"] != null) {setStorageItem("homePlayerLogo", updateJSON["homePlayerLogo"]);}
+		if (updateJSON["awayPlayerLogo"] != null) {setStorageItem("awayPlayerLogo", updateJSON["awayPlayerLogo"]);}
+
+		if (updateJSON["matchFormat"].length > 1) {document.getElementById("raceInfoTxt").value = updateJSON["matchFormat"];}
+		if (updateJSON["eventName"].length > 1) {document.getElementById("gameInfoTxt").value = updateJSON["eventName"];}
+		postInfo();
+		if (updateJSON["homePlayer"].length > 1) {document.getElementById("p1Name").value = updateJSON["homePlayer"];}
+		if (updateJSON["awayPlayer"].length > 1) {document.getElementById("p2Name").value = updateJSON["awayPlayer"];}
+		postNames();
+		if (updateJSON["homePlayerScore"] != null) {document.getElementById("p1Score").value = updateJSON["homePlayerScore"];}
+ 		if (updateJSON["awayPlayerScore"] != null) {document.getElementById("p2Score").value = updateJSON["awayPlayerScore"];}	
+		pushScores();	
+	}	
+}
+
+function updateStreamStatus() {
+	if (getStorageItem("streamStatus") === "true") {
+		document.getElementById("streamStatus").textContent = "Stream On";
+		if (getStorageItem("streamKey") != null) {
+			setOBSStreamKey(getStorageItem("streamKey"));
+		}
+		startOBSStream();
+	} else {
+		document.getElementById("streamStatus").textContent = "Stream Off";
+		stopOBSStream();
+	}
+}
+
 function setOBSStreamKey(newKey) {
 	const obsWS = new OBSWebSocket();
 
@@ -73,22 +120,98 @@ function setOBSStreamKey(newKey) {
 		})
 		.then(data => {
 			console.log('Current Stream Service Settings:', data);
-			if (data.streamServiceType === 'rtmp_common') {
-				const newSettings = {
-					...data.streamServiceSettings, // Keep existing settings
-					key: newKey // Update the stream key
-				};
-				return obsWS.call('SetStreamServiceSettings', {
-					streamServiceType: 'rtmp_common',
-					streamServiceSettings: newSettings
-				});
-			} else {
-				console.log('Stream service is not RTMPStream, skipping stream key update.');
-				return Promise.resolve(); // Resolve to continue the chain
+			if (data.streamServiceSettings.key !== newKey) {
+				if (data.streamServiceType === 'rtmp_common') {
+					const newSettings = {
+						...data.streamServiceSettings, // Keep existing settings
+						key: newKey // Update the stream key
+					};
+					return obsWS.call('SetStreamServiceSettings', {
+						streamServiceType: 'rtmp_common',
+						streamServiceSettings: newSettings
+					});
+				} else {
+					console.log('Stream service is not RTMPStream, skipping stream key update.');
+					return Promise.resolve(); // Resolve to continue the chain
+				}
 			}
 		})
 		.then(() => {
 			console.log('Stream service settings updated (if applicable).');
+			obsWS.disconnect();
+		})
+		.catch(err => {
+			console.error('Error:', err);
+		});
+
+	// Event listeners (optional, but useful for real-time updates)
+	obsWS.on('ConnectionClosed', () => {
+		console.log('Disconnected from OBS WebSocket');
+	});
+
+	obsWS.on('error', err => {
+		console.error('OBS WebSocket error:', err);
+	});
+
+	return obsWS;
+}
+
+function changeOBSProfile(newProfile) {
+	const obsWS = new OBSWebSocket();
+
+	obsWS.connect()
+		.then(() => {
+			console.log('Connected to OBS WebSocket Profile');
+			return obsWS.call('GetProfileList');
+		})
+		.then(data => {
+			console.log('Current Profile:', data.currentProfileName);
+			if (data.currentProfileName !== newProfile) {
+				return obsWS.call('SetCurrentProfile', { profileName: newProfile });
+			} else {
+				console.log('Profile is already set to the desired profile.');
+				return Promise.resolve(); // Resolve to continue the chain
+			}
+		})
+		.then(() => {
+			console.log('Profile changed (if applicable).');
+			obsWS.disconnect();
+		})
+		.catch(err => {
+			console.error('Error:', err);
+		});
+	
+	obsWS.on('ConnectionClosed', () => {
+		console.log('Disconnected from OBS WebSocket');
+	});
+	obsWS.on('error', err => {
+		console.error('OBS WebSocket error:', err);
+	});
+	return obsWS;
+}	
+
+
+
+function startOBSStream() {
+	const obsWS = new OBSWebSocket();
+
+	obsWS.connect()
+		.then(() => {
+			console.log('Connected to OBS WebSocket');
+			// Example: Get the current scene
+			return obsWS.call('GetStreamStatus');
+		})
+		.then(data => {
+			console.log('Current Stream Status', data);
+			if (data.outputActive === false) {
+				return obsWS.call('StartStream');
+			} else {
+				console.log('Stream service is already running');
+				return Promise.resolve(); // Resolve to continue the chain
+			}
+		})
+		.then(() => {
+			console.log('Stream service Started');
 			obsWS.disconnect();
 		})
 		.catch(err => {
@@ -118,7 +241,7 @@ function stopOBSStream() {
 		})
 		.then(data => {
 			console.log('Current Stream Status', data);
-			if (data.responseData.outputActive === true) {
+			if (data.outputActive === true) {
 				return obsWS.call('StopStream');
 			} else {
 				console.log('Stream service is already running');
@@ -189,7 +312,7 @@ function connectPSLiveStream() {
 		var messageJSON = JSON.parse(message.toString());
 		//check if the message for this Rig
 		if (messageJSON['rigId'] === psRigId) {
-			saveMatchInfo(JSON.parse(message.toString()));
+			poolstatUpdate(JSON.parse(message.toString()));
 		} else {
 			//it is not ours so check if it matches our CompetitionID and if it does process it for 
 			//Ticker display
@@ -684,15 +807,6 @@ function poolStatSetting() {
     updateTabVisibility();
 }
 
-function poolStatConfigOutputFile() {
-    var usePoolStatConfigOutputFile = document.getElementById("poolStatConfigOutputFileCheckbox");
-    var isChecked = usePoolStatConfigOutputFile.checked;
-    var storageValue = isChecked ? "yes" : "no";
-    
-	console.log(`Use PoolStat Output to File ${isChecked}`);
-    setStorageItem("usePoolStatOutputFile", storageValue);
-}
-
 function poolStatConfigTicker() {
     var usePoolStatConfigTicker = document.getElementById("poolStatConfigTickerCheckbox");
     var isChecked = usePoolStatConfigTicker.checked;
@@ -824,26 +938,7 @@ function postInfo() {
 	setStorageItem("gameInfo", gameInfoTxt.value);
 }
 
-function saveMatchInfo(updateJSON) {
-	if (Object.keys(updateJSON).length == 14) {
-		console.log('Update Received');
-		if (updateJSON["compId"].length > 1) {setStorageItem("compId", updateJSON["compId"]);}
-		if (updateJSON["matchId"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
-		if (updateJSON["table"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
-		if (updateJSON["obsProfileName"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
-		if (updateJSON["matchId"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}
 
-		if (updateJSON["mf"].length > 1) {document.getElementById("raceInfoTxt").value = updateJSON["mf"];}
-		if (updateJSON["ev"].length > 1) {document.getElementById("gameInfoTxt").value = updateJSON["ev"];}
-		postInfo();
-		if (updateJSON["hp"].length > 1) {document.getElementById("p1Name").value = updateJSON["hp"];}
-		if (updateJSON["ap"].length > 1) {document.getElementById("p2Name").value = updateJSON["ap"];}
-		postNames();
-		if (updateJSON["hs"] != null) {document.getElementById("p1Score").value = updateJSON["hs"];}
- 		if (updateJSON["as"] != null) {document.getElementById("p2Score").value = updateJSON["as"];}	
-		pushScores();	
-	}	
-}
 
 
 function pushScores() {

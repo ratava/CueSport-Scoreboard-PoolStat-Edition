@@ -114,16 +114,6 @@ window.onload = function() {
 		setStorageItem("usePoolStat", "no");
 		poolStatSetting();
 	}
-
-	if (getStorageItem("usePoolStatOutputFile")==="yes" || getStorageItem("usePoolStatOutputFile") === null) {
-		document.getElementById("poolStatConfigOutputFileCheckbox").checked = true;
-		setStorageItem("usePoolStatOutputFile", "yes");
-		poolStatSetting();
-	} else {
-		document.getElementById("poolStatConfigOutputFileCheckbox").checked = false;
-		setStorageItem("usePoolStatOutputFile", "no");
-		poolStatSetting();
-	}
 	
 	if (getStorageItem("usePoolStatTicker")==="yes" || getStorageItem("usePoolStatTicker") === null) {
 		document.getElementById("poolStatConfigTickerCheckbox").checked = true;
@@ -236,11 +226,7 @@ window.onload = function() {
 		setStorageItem("usePoolStat", "yes");
 		console.log ('PoolStat initalised')
 	}
-	
-	if (getStorageItem("usePoolStatOutputFile") === null) {
-		setStorageItem("usePoolStatOutputFile", "no");
-		console.log ('PoolStat Output File initalised')
-	}
+
 
 	if (getStorageItem("usePoolStatTicker") === null) {
 		setStorageItem("usePoolStatTicker", "no");

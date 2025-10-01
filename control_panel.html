@@ -178,18 +178,20 @@ for more information about Salotto please visit https://salotto.app
                 </div>
                 <div class="column-center">
                     <div>
-                        <text id="psLiveStatusTxt">PoolStat LiveStream Status: </text>&nbsp;
+                        <text id="psLiveStatusTxt">PoolStat LiveStream Connection Status: </text>&nbsp;
                         <text id="psLiveStatus"></text>
                     </div>
+                </div>                      
+                <div class="column-center">
+                    <div>
+                        <text id="streamStatusTxt">Stream Status: </text>&nbsp;
+                        <text id="streamStatus"></text>
+                    </div>                    
                 </div>
                 <div class="section-header" id="poolStatLabel">
                     PoolStat configuration
                 </div>        
                 <div class="column">
-                    <div>
-                        <label for="poolStatConfigOutputFileCheckbox" id="labelPoolStatConfigOutputFileCheckbox">Output to File</label>
-                        <input type="checkbox" class="smallSize" id="poolStatConfigOutputFileCheckbox" onchange="poolStatConfigOutputFile()"/>
-                    </div>
                     <div>
                         <label for="poolStatConfigTickerCheckbox" id="labelPoolStatConfigTickerCheckbox">Marquee Ticker</label>
                         <input type="checkbox" class="smallSize" id="poolStatConfigTickerCheckbox" onchange="poolStatConfigTicker()"/>
