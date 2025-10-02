@@ -67,7 +67,6 @@ function poolstatUpdate(updateJSON) {
 		console.log('Update Received');
 		if (updateJSON["compId"].length > 1) {setStorageItem("compId", updateJSON["compId"]);}
 		if (updateJSON["matchId"].length > 1) {setStorageItem("matchId", updateJSON["matchId"]);}
-		if (updateJSON["table"].length > 1) {setStorageItem("matchId", updateJSON["table"]);}
 		if (updateJSON["obsProfileName"].length > 1) {setStorageItem("obsProfileName", updateJSON["obsProfileName"]);}
 			
 		if (updateJSON["matchId"].length > 1) {setStorageItem("matchId", updateJSON["compId"]);}

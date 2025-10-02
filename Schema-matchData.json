@@ -17,9 +17,6 @@
     "obsSceneName": {
       "type": "string"
     },
-    "table": {
-      "type": "integer"
-    },
     "streamKey": {
       "type": "string"
     },
@@ -65,7 +62,6 @@
     "compId",
     "matchId",
     "obsProfileName",
-    "table",
     "streamKey",
     "streamStatus",
     "matchStatus",
