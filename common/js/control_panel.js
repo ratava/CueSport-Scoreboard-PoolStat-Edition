@@ -30,6 +30,8 @@
 // 	}
 // }
 
+// declare mqtt client variable
+let client = null;
 
 function updateTabVisibility() {
     // Get the state of the player settings
@@ -94,6 +96,73 @@ function poolstatUpdate(updateJSON) {
 		pushScores();	
 	}	
 }
+
+async function getOBSProfiles() {
+	const obsWS = new OBSWebSocket();
+	try {
+		await obsWS.connect();
+		const data = await obsWS.call('GetProfileList');
+		await obsWS.disconnect();
+		return data.profiles;
+	} catch (err) {
+		console.error('Error fetching profiles:', err);
+		return null;
+	}
+}
+
+async function getOBSScenes() {
+	const obsWS = new OBSWebSocket();
+	try {
+		await obsWS.connect();
+		const data = await obsWS.call('GetSceneList');
+		await obsWS.disconnect();
+		return data.scenes;
+	} catch (err) {
+		console.error('Error fetching scenes:', err);
+		return null;
+	}
+}
+
+function getOBStreamConfig() {
+	const obsWS = new OBSWebSocket();
+	return obsWS.connect()
+		.then(() => obsWS.call('GetStreamServiceSettings'))
+		.then(data => {
+			const response = {
+				streamKey: data.streamServiceSettings.key,
+				service: data.streamServiceSettings.service
+			};
+			obsWS.disconnect();
+			return response;
+		})
+		.catch(err => {
+			console.error('Error:', err);
+			return null;
+		});
+}
+
+
+async function sendOBSConfig(data) {
+	try {
+		const profiles = await getOBSProfiles();
+		const scenes = await getOBSScenes();
+		const streamConfig = await getOBStreamConfig();
+
+		const messageJSON = {
+			rigId: data.rigId,
+			profiles: profiles,
+			scenes: scenes,
+			streamConfig: streamConfig
+		};
+
+		console.log('OBS Config Message:', JSON.stringify(messageJSON));
+		client.publish('livestream/rigConfig', JSON.stringify(messageJSON));
+	} catch (err) {
+		console.error('Failed to send OBS config:', err);
+	}
+}
+
+
 
 function updateStreamStatus() {
 	if (getStorageItem("streamStatus") === "true") {
@@ -187,8 +256,7 @@ function changeOBSProfile(newProfile) {
 		console.error('OBS WebSocket error:', err);
 	});
 	return obsWS;
-}	
-
+}
 
 
 function startOBSStream() {
@@ -267,7 +335,6 @@ function stopOBSStream() {
 	return obsWS;
 }
 
-
 function connectPSLiveStream() {
 	const psRigId = getStorageItem("PoolStatRigID");
 	console.log(psRigId);
@@ -290,7 +357,7 @@ function connectPSLiveStream() {
     console.log('Connecting to PoolStat Live Stream server')
 	psLiveStatus.textContent = 'Connecting to PoolStat Live Stream server';
 
-    const client = mqtt.connect(host, options)
+    client = mqtt.connect(host, options)
   
     client.on('connect', function () {
     	console.log('Connected to PoolStat Live Stream');
@@ -298,6 +365,7 @@ function connectPSLiveStream() {
 
 		console.log('Subscribing & Sending Status');
     	client.subscribe('livestream/matches');
+		client.subscribe('livestream/rigConfig');
     	client.publish('livestream/status','Rig ' + psRigId + ' Online');
     })
 
@@ -307,16 +375,29 @@ function connectPSLiveStream() {
     })
 
     client.on('message', function (topic, message) {
-      if (JSON.parse(message.toString())) {
-		var messageJSON = JSON.parse(message.toString());
-		//check if the message for this Rig
-		if (messageJSON['rigId'] === psRigId) {
-			poolstatUpdate(JSON.parse(message.toString()));
-		} else {
-			//it is not ours so check if it matches our CompetitionID and if it does process it for 
-			//Ticker display
-		}
-      }
+	  switch (topic)	{
+		case 'livestream/matches':
+			if (JSON.parse(message.toString())) {
+				var messageJSON = JSON.parse(message.toString());
+				//check if the message for this Rig
+				if (messageJSON['rigId'] === psRigId) {
+					poolstatUpdate(JSON.parse(message.toString()));
+				} else {
+					//it is not ours so check if it matches our CompetitionID and if it does process it for 
+					//Ticker display
+				}
+			}
+			break;
+		case 'livestream/rigConfig':
+			if (JSON.parse(message.toString())) {
+				var messageJSON = JSON.parse(message.toString());
+				//check if the message for this Rig
+				if (messageJSON['rigId'] === psRigId && messageJSON['request'] === 'rigConfig') {
+					sendOBSConfig({ rigId: messageJSON['rigId'] });
+				}
+			}
+			break;
+	  }
     })
 
     client.on('reconnect', () => {
